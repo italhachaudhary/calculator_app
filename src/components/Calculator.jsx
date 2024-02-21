@@ -1,115 +1,208 @@
 import React, { useState } from "react";
-import * as math from "mathjs";
 
-export default function Calculator() {
-  const [result, setResult] = useState("");
-  const [selectedOperator, setSelectedOperator] = useState("");
+function Calculator() {
+  const [expressionAndResult, setExpressionAndResult] = useState("");
 
-  const handleClick = (e) => {
-    const buttonName = e.target.name;
-
-    if (isNaN(buttonName)) {
-      if (selectedOperator && selectedOperator !== buttonName) {
-        setSelectedOperator(buttonName);
-        setResult(result.slice(0, -1).concat(buttonName));
-      } else if (!selectedOperator) {
-        setSelectedOperator(buttonName);
-        setResult(result.concat(buttonName));
-      }
-    } else {
-      if (selectedOperator) {
-        if (result.slice(-1) === selectedOperator) {
-          setResult(result.concat(buttonName));
-        } else {
-          setResult(result + selectedOperator + buttonName);
-        }
-        setSelectedOperator("");
-      } else {
-        setResult(result.concat(buttonName));
-      }
-    }
-  };
-
-  const clear = () => {
-    setResult("");
-    setSelectedOperator("");
-  };
-
-  const backspace = () => {
-    setResult(result.slice(0, -1));
-    setSelectedOperator("");
+  const handleClick = (value) => {
+    setExpressionAndResult((prevValue) => prevValue + value);
   };
 
   const calculate = () => {
     try {
-      setResult(math.evaluate(result).toString());
-      setSelectedOperator("");
-    } catch (err) {
-      setResult("Error");
+      const expression = expressionAndResult;
+      const evaluatedResult = executeExpression(expression);
+      setExpressionAndResult(expression + "=" + evaluatedResult);
+    } catch (error) {
+      setExpressionAndResult("Error");
     }
+  };
+
+  const executeExpression = (expression) => {
+    const operations = {
+      "/": (a, b) => a / b,
+      "*": (a, b) => a * b,
+      "+": (a, b) => a + b,
+      "-": (a, b) => a - b,
+    };
+
+    const operationOrder = ["/", "*", "+", "-"];
+    let result = [];
+
+    for (let currentOperator of operationOrder) {
+      const [before, after] = expression.split(`${currentOperator}`);
+      if (after !== undefined) {
+        const operand1 = executeExpression(before);
+        const operand2 = executeExpression(after);
+        result = [operations[currentOperator](operand1, operand2)];
+        expression = result[0].toString();
+      }
+    }
+
+    return result.length > 0 ? result[0] : parseFloat(expression);
+  };
+
+  const clear = () => {
+    setExpressionAndResult("");
   };
 
   return (
     <div className="container">
-      <form>
-        <input type="text" value={result} />
-      </form>
-      <div className="keypad">
-        <button className="highlight" onClick={clear} id="clear">
-          Clear
-        </button>
-        <button className="highlight" onClick={backspace} id="backspace">
-          C
-        </button>
-        <button className="highlight" name="/" onClick={handleClick}>
-          &divide;
-        </button>
-        <button name="7" onClick={handleClick}>
-          7
-        </button>
-        <button name="8" onClick={handleClick}>
-          8
-        </button>
-        <button name="9" onClick={handleClick}>
-          9
-        </button>
-        <button className="highlight" name="*" onClick={handleClick}>
-          &times;
-        </button>
-        <button name="4" onClick={handleClick}>
-          4
-        </button>
-        <button name="5" onClick={handleClick}>
-          5
-        </button>
-        <button name="6" onClick={handleClick}>
-          6
-        </button>
-        <button className="highlight" name="-" onClick={handleClick}>
-          &ndash;
-        </button>
-        <button name="1" onClick={handleClick}>
-          1
-        </button>
-        <button name="2" onClick={handleClick}>
-          2
-        </button>
-        <button name="3" onClick={handleClick}>
-          3
-        </button>
-        <button className="highlight" name="+" onClick={handleClick}>
-          +
-        </button>
-        <button name="0" onClick={handleClick}>
-          0
-        </button>
-        <button className="highlight" name="." onClick={handleClick}>
-          .
-        </button>
-        <button className="highlight" name="=" onClick={calculate} id="result">
-          =
-        </button>
+      <div>
+        <div>
+          <h1>Calculator</h1>
+          <input
+            type="text"
+            className="  mb-4 d-block "
+            value={expressionAndResult}
+            onChange={(e) => setExpressionAndResult(e.target.value)}
+          />
+          <button onClick={clear} className="btn btn-danger mb-2 ">
+            C
+          </button>
+          <table>
+            <tbody>
+              <tr>
+                <td>
+                  <button
+                    onClick={() => handleClick("7")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    7
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("8")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    8
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("9")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    9
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("/")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    /
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <button
+                    onClick={() => handleClick("4")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    4
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("5")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    5
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("6")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    6
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("*")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    *
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <button
+                    onClick={() => handleClick("1")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    1
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("2")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    2
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("3")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    3
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("-")}
+                    className="btn btn-light btn-lg mb-2 w-100"
+                  >
+                    -
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <button
+                    onClick={() => handleClick("0")}
+                    className="btn btn-light btn-lg w-100"
+                  >
+                    0
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick(".")}
+                    className="btn btn-light btn-lg w-100"
+                  >
+                    .
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={calculate}
+                    className="btn btn-light btn-lg w-100"
+                  >
+                    =
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleClick("+")}
+                    className="btn btn-light btn-lg w-100"
+                  >
+                    +
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
+
+export default Calculator;
