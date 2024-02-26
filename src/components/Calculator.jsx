@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 
 function Calculator() {
-  const [expressionAndResult, setExpressionAndResult] = useState("");
+  const [calculateResult, setcalculateResult] = useState("");
+  let result = [];
 
   const handleClick = (value) => {
-    setExpressionAndResult((prevValue) => prevValue + value);
+    setcalculateResult((prevValue) => prevValue + value);
   };
 
   const calculate = () => {
     try {
-      const expression = expressionAndResult;
+      const expression = calculateResult;
       const evaluatedResult = executeExpression(expression);
-      setExpressionAndResult(expression + "=" + evaluatedResult);
+      setcalculateResult(evaluatedResult);
     } catch (error) {
-      setExpressionAndResult("Error");
+      setcalculateResult("Error");
     }
   };
 
@@ -26,7 +27,6 @@ function Calculator() {
     };
 
     const operationOrder = ["/", "*", "+", "-"];
-    let result = [];
 
     for (let currentOperator of operationOrder) {
       const [before, after] = expression.split(`${currentOperator}`);
@@ -42,7 +42,7 @@ function Calculator() {
   };
 
   const clear = () => {
-    setExpressionAndResult("");
+    setcalculateResult("");
   };
 
   return (
@@ -50,11 +50,12 @@ function Calculator() {
       <div>
         <div>
           <h1>Calculator</h1>
+          <p>{result}</p>
           <input
             type="text"
             className="  mb-4 d-block "
-            value={expressionAndResult}
-            onChange={(e) => setExpressionAndResult(e.target.value)}
+            value={calculateResult}
+            onChange={(e) => setcalculateResult(e.target.value)}
           />
           <button onClick={clear} className="btn btn-danger mb-2 ">
             C
