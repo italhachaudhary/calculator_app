@@ -1,44 +1,38 @@
 import React, { useState } from "react";
 
-function Calculator() {
+export default function Calculator() {
   const [calculateResult, setcalculateResult] = useState("");
-  let result = [];
+  const [operator, setOperator] = useState("");
 
   const handleClick = (value) => {
-    setcalculateResult((prevValue) => prevValue + value);
+    if (
+      calculateResult === "" &&
+      (value === "/" || value === "*" || value === "+")
+    ) {
+      return;
+    }
+    setcalculateResult(calculateResult + value);
   };
 
   const calculate = () => {
-    try {
-      const expression = calculateResult;
-      const evaluatedResult = executeExpression(expression);
-      setcalculateResult(evaluatedResult);
-    } catch (error) {
-      setcalculateResult("Error");
+    const values = calculateResult.split(operator);
+
+    switch (operator) {
+      case "+":
+        setcalculateResult(parseFloat(values[0]) + parseFloat(values[1]));
+        break;
+      case "-":
+        setcalculateResult(parseFloat(values[0]) - parseFloat(values[1]));
+        break;
+      case "*":
+        setcalculateResult(parseFloat(values[0]) * parseFloat(values[1]));
+        break;
+      case "/":
+        setcalculateResult(parseFloat(values[0]) / parseFloat(values[1]));
+        break;
+      default:
+        setcalculateResult("Invalid Operator");
     }
-  };
-
-  const executeExpression = (expression) => {
-    const operations = {
-      "/": (a, b) => a / b,
-      "*": (a, b) => a * b,
-      "+": (a, b) => a + b,
-      "-": (a, b) => a - b,
-    };
-
-    const operationOrder = ["/", "*", "+", "-"];
-
-    for (let currentOperator of operationOrder) {
-      const [before, after] = expression.split(`${currentOperator}`);
-      if (after !== undefined) {
-        const operand1 = executeExpression(before);
-        const operand2 = executeExpression(after);
-        result = [operations[currentOperator](operand1, operand2)];
-        expression = result[0].toString();
-      }
-    }
-
-    return result.length > 0 ? result[0] : parseFloat(expression);
   };
 
   const clear = () => {
@@ -50,12 +44,14 @@ function Calculator() {
       <div>
         <div>
           <h1>Calculator</h1>
-          <p>{result}</p>
+
           <input
             type="text"
             className="  mb-4 d-block "
             value={calculateResult}
-            onChange={(e) => setcalculateResult(e.target.value)}
+            onChange={(e) => {
+              setcalculateResult(e.target.value);
+            }}
           />
           <button onClick={clear} className="btn btn-danger mb-2 ">
             C
@@ -89,7 +85,10 @@ function Calculator() {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleClick("/")}
+                    onClick={() => {
+                      setOperator("/");
+                      handleClick("/");
+                    }}
                     className="btn btn-light btn-lg mb-2 w-100"
                   >
                     /
@@ -123,7 +122,10 @@ function Calculator() {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleClick("*")}
+                    onClick={() => {
+                      setOperator("*");
+                      handleClick("*");
+                    }}
                     className="btn btn-light btn-lg mb-2 w-100"
                   >
                     *
@@ -157,7 +159,10 @@ function Calculator() {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleClick("-")}
+                    onClick={() => {
+                      setOperator("-");
+                      handleClick("-");
+                    }}
                     className="btn btn-light btn-lg mb-2 w-100"
                   >
                     -
@@ -191,7 +196,10 @@ function Calculator() {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleClick("+")}
+                    onClick={() => {
+                      setOperator("+");
+                      handleClick("+");
+                    }}
                     className="btn btn-light btn-lg w-100"
                   >
                     +
@@ -205,5 +213,3 @@ function Calculator() {
     </div>
   );
 }
-
-export default Calculator;
